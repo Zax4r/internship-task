@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.schemas.enums import CurrencyEnum, TransactionStatusEnum
+from app.core.enums import CurrencyEnum, TransactionStatusEnum
 
 
 class RequestTransactionModel(BaseModel):

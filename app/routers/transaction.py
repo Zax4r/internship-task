@@ -6,6 +6,7 @@ from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_async_session
+from app.core.enums import CurrencyEnum, TransactionStatusEnum
 from app.core.exceptions import (
     BadRequestDataException,
     CreateTransactionForBlockedUserException,
@@ -27,7 +28,6 @@ from app.queries import (
     get_registered_users_count,
     get_transactions_count,
 )
-from app.schemas.enums import CurrencyEnum, TransactionStatusEnum
 from app.schemas.transaction import RequestTransactionModel, TransactionModel
 
 router = APIRouter()

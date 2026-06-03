@@ -6,6 +6,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_async_session
+from app.core.enums import CurrencyEnum, UserStatusEnum
 from app.core.exceptions import (
     BadRequestDataException,
     UserAlreadyActiveException,
@@ -14,7 +15,6 @@ from app.core.exceptions import (
     UserNotExistsException,
 )
 from app.models.user import User, UserBalance
-from app.schemas.enums import CurrencyEnum, UserStatusEnum
 from app.schemas.user import RequestUserModel, RequestUserUpdateModel, ResponseUserModel, UserModel
 
 router = APIRouter()

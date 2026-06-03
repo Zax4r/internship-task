@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic.v1 import root_validator
 
-from app.schemas.enums import CurrencyEnum, UserStatusEnum
+from app.core.enums import CurrencyEnum, UserStatusEnum
 
 
 class RequestUserModel(BaseModel):

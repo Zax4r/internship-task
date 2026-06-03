@@ -22,3 +22,17 @@ class TransactionStatusEnum(StrEnum):
 class UserStatusEnum(StrEnum):
     ACTIVE = 'ACTIVE'
     BLOCKED = 'BLOCKED'
+
+
+EXCHANGE_RATES_TO_USD = {
+    CurrencyEnum.USD: 1,
+    CurrencyEnum.EUR: 0.9342,
+    CurrencyEnum.AUD: 0.5447,
+    CurrencyEnum.CAD: 0.6162,
+    CurrencyEnum.ARS: 0.0009,
+    CurrencyEnum.PLN: 0.2343,
+    CurrencyEnum.BTC: 100000.0,
+    CurrencyEnum.ETH: 3557.3476,
+    CurrencyEnum.DOGE: 0.3627,
+    CurrencyEnum.USDT: 0.9709,
+}
