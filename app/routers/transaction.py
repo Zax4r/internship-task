@@ -19,7 +19,8 @@ from app.core.exceptions import (
 )
 from app.models.transaction import Transaction
 from app.models.user import User, UserBalance
-from app.queries import (
+from app.schemas.transaction import RequestTransactionModel, TransactionModel
+from app.services.queries import (
     get_not_rollbacked_deposit_amount,
     get_not_rollbacked_transactions_count,
     get_not_rollbacked_withdraw_amount,
@@ -28,7 +29,6 @@ from app.queries import (
     get_registered_users_count,
     get_transactions_count,
 )
-from app.schemas.transaction import RequestTransactionModel, TransactionModel
 
 router = APIRouter()
 
