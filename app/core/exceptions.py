@@ -1,34 +1,73 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 
-class UserAlreadyExistsException(HTTPException): ...
+class AppException(HTTPException):
+    default_status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_detail = 'Internal server error'
+
+    def __init__(self, status_code: int = None, detail: str = None):
+        super().__init__(status_code=status_code or self.default_status_code, detail=detail or self.default_detail)
 
 
-class UserNotExistsException(HTTPException): ...
+class BadRequestException(AppException):
+    default_status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = 'Bad request'
 
 
-class UserAlreadyBlockedException(HTTPException): ...
+class NotFoundException(AppException):
+    default_status_code = status.HTTP_404_NOT_FOUND
+    default_detail = 'Resource not found'
 
 
-class UserAlreadyActiveException(HTTPException): ...
+class ConflictException(AppException):
+    default_status_code = status.HTTP_409_CONFLICT
+    default_detail = 'Resource already exists'
 
 
-class BadRequestDataException(HTTPException): ...
+class UnprocessableException(AppException):
+    default_status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    default_detail = 'Unprocessable data in request'
 
 
-class NegativeBalanceException(HTTPException): ...
+class UserAlreadyExistsException(ConflictException):
+    pass
 
 
-class TransactionNotExistsException(HTTPException): ...
+class UserNotExistsException(NotFoundException):
+    pass
 
 
-class TransactionDoesNotBelongToUserException(HTTPException): ...
+class UserAlreadyBlockedException(BadRequestException):
+    pass
 
 
-class CreateTransactionForBlockedUserException(HTTPException): ...
+class UserAlreadyActiveException(BadRequestException):
+    pass
 
 
-class UpdateTransactionForBlockedUserException(HTTPException): ...
+class BadRequestDataException(UnprocessableException):
+    pass
 
 
-class TransactionAlreadyRollbackedException(HTTPException): ...
+class NegativeBalanceException(BadRequestException):
+    pass
+
+
+class TransactionNotExistsException(BadRequestException):
+    pass
+
+
+class TransactionDoesNotBelongToUserException(BadRequestException):
+    pass
+
+
+class CreateTransactionForBlockedUserException(NotFoundException):
+    pass
+
+
+class UpdateTransactionForBlockedUserException(BadRequestException):
+    pass
+
+
+class TransactionAlreadyRollbackedException(BadRequestException):
+    pass

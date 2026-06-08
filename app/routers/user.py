@@ -52,12 +52,10 @@ async def post_user(user: RequestUserModel, session: AsyncSession = Depends(get_
     email = user.email.strip()
     email = ''.join([x for x in email if x != ' '])
     if len(email) == 0:
-        raise BadRequestDataException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Email can't consist entirely of spaces")
+        raise BadRequestDataException(detail="Email can't consist entirely of spaces")
     db_user = await session.execute(select(User).where(User.email == user.email))
     if db_user.scalar():
-        raise UserAlreadyExistsException(
-            status_code=status.HTTP_409_CONFLICT, detail='User with email=`{0}` already exists'.format(user.email)
-        )
+        raise UserAlreadyExistsException(detail='User with email=`{0}` already exists'.format(user.email))
     db_user = User(email=user.email, status='ACTIVE', created=datetime.utcnow())
     session.add(db_user)
     await session.commit()
@@ -75,19 +73,15 @@ async def post_user(user: RequestUserModel, session: AsyncSession = Depends(get_
 @router.patch('/users/{user_id}', response_model=Optional[UserModel] | None)
 async def patch_user(user_id: int, user: RequestUserUpdateModel, session: AsyncSession = Depends(get_async_session)):
     if user_id < 0:
-        raise BadRequestDataException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='Unprocessable data in request')
+        raise BadRequestDataException(detail='Unprocessable data in request')
     db_user = await session.execute(select(User).where(User.id == user_id))
     db_user = db_user.scalar()
     if not db_user:
-        raise UserNotExistsException(status_code=status.HTTP_404_NOT_FOUND, detail='User with id=`{0}` does not exist'.format(user_id))
+        raise UserNotExistsException(detail='User with id=`{0}` does not exist'.format(user_id))
     if db_user.status == 'BLOCKED' and user.status == 'BLOCKED':
-        raise UserAlreadyBlockedException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail='User with id=`{0}` is already blocked'.format(user_id)
-        )
+        raise UserAlreadyBlockedException(detail='User with id=`{0}` is already blocked'.format(user_id))
     if db_user.status == 'ACTIVE' and user.status == 'ACTIVE':
-        raise UserAlreadyActiveException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail='User with id=`{0}` is already active'.format(user_id)
-        )
+        raise UserAlreadyActiveException(detail='User with id=`{0}` is already active'.format(user_id))
     await session.execute(update(User).values(**{'status': user.status}).where(User.id == user_id))
     await session.commit()
     user = await session.execute(select(User).where(User.id == user_id))
