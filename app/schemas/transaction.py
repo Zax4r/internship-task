@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -11,11 +12,11 @@ class RequestTransactionModel(BaseModel):
 
 
 class TransactionModel(BaseModel):
-    id: int | None
-    user_id: int | None = None
-    currency: CurrencyEnum | None = None
-    amount: float | None = None
-    status: TransactionStatusEnum | None = None
-    created: datetime | None = None
+    id: Optional[int]
+    user_id: Optional[int] = None
+    currency: Optional[CurrencyEnum] = None
+    amount: Optional[float] = None
+    status: Optional[TransactionStatusEnum] = None
+    created: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)

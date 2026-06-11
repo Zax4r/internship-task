@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -19,9 +20,9 @@ class RequestUserModel(BaseModel):
 
 
 class RequestListUserModel(BaseModel):
-    user_id: int | None = None
-    email: str | None = None
-    user_status: str | None = None
+    user_id: Optional[int] = None
+    email: Optional[str] = None
+    user_status: Optional[str] = None
 
 
 class RequestUserUpdateModel(BaseModel):
@@ -29,32 +30,32 @@ class RequestUserUpdateModel(BaseModel):
 
 
 class ResponseUserBalanceModel(BaseModel):
-    currency: CurrencyEnum | None = None
-    amount: float | None = None
+    currency: Optional[CurrencyEnum] = None
+    amount: Optional[float] = None
 
 
 class ResponseUserModel(BaseModel):
-    id: int | None
-    email: str | None = None
-    status: UserStatusEnum | None = None
-    created: datetime | None = None
-    balances: list[ResponseUserBalanceModel | None] = None
+    id: Optional[int]
+    email: Optional[str] = None
+    status: Optional[UserStatusEnum] = None
+    created: Optional[datetime] = None
+    balances: Optional[list[ResponseUserBalanceModel]] = None
 
 
 class UserModel(BaseModel):
-    id: int | None
-    email: str | None = None
-    status: UserStatusEnum | None = None
-    created: datetime | None = None
+    id: Optional[int]
+    email: Optional[str] = None
+    status: Optional[UserStatusEnum] = None
+    created: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class UserBalanceModel(BaseModel):
-    id: int | None
-    user_id: int | None = None
-    currency: CurrencyEnum | None = None
-    amount: float | None = None
+    id: Optional[int]
+    user_id: Optional[int] = None
+    currency: Optional[CurrencyEnum] = None
+    amount: Optional[float] = None
 
     @field_validator('amount', mode='before')
     @classmethod
