@@ -1,8 +1,6 @@
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel
-from pydantic.v1 import root_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.core.enums import CurrencyEnum, UserStatusEnum
 
@@ -10,41 +8,58 @@ from app.core.enums import CurrencyEnum, UserStatusEnum
 class RequestUserModel(BaseModel):
     email: str
 
+    @field_validator('email', mode='before')
+    @classmethod
+    def ensure_email(cls, value: str) -> str:
+        email = value.strip()
+        email = ''.join([x for x in email if x != ' '])
+        if len(email) == 0:
+            raise ValueError("Email can't consist entirely of spaces")
+        return email
+
+
+class RequestListUserModel(BaseModel):
+    user_id: int | None = None
+    email: str | None = None
+    user_status: str | None = None
+
 
 class RequestUserUpdateModel(BaseModel):
     status: UserStatusEnum
 
 
 class ResponseUserBalanceModel(BaseModel):
-    currency: Optional[CurrencyEnum] = None
-    amount: Optional[float] = None
+    currency: CurrencyEnum | None = None
+    amount: float | None = None
 
 
 class ResponseUserModel(BaseModel):
-    id: Optional[int]
-    email: Optional[str] = None
-    status: Optional[UserStatusEnum] = None
-    created: Optional[datetime] = None
-    balances: Optional[list[ResponseUserBalanceModel]] = None
+    id: int | None
+    email: str | None = None
+    status: UserStatusEnum | None = None
+    created: datetime | None = None
+    balances: list[ResponseUserBalanceModel | None] = None
 
 
 class UserModel(BaseModel):
-    id: Optional[int]
-    email: Optional[str] = None
-    status: Optional[UserStatusEnum] = None
-    created: Optional[datetime] = None
+    id: int | None
+    email: str | None = None
+    status: UserStatusEnum | None = None
+    created: datetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserBalanceModel(BaseModel):
-    id: Optional[int]
-    user_id: Optional[int] = None
-    currency: Optional[CurrencyEnum] = None
-    amount: Optional[float] = None
+    id: int | None
+    user_id: int | None = None
+    currency: CurrencyEnum | None = None
+    amount: float | None = None
 
-    @root_validator(pre=True)
-    def validate_not_negative(self, values):
-        if 'amount' in values and values.get('amount'):
-            if values['amount'] < 0:
-                raise ValueError('Amount cannot be negative')
+    @field_validator('amount', mode='before')
+    @classmethod
+    def validate_not_negative(cls, value: float) -> float:
+        if value < 0:
+            raise ValueError('Amount cannot be negative')
 
-        return values
+        return value

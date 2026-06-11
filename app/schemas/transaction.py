@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.core.enums import CurrencyEnum, TransactionStatusEnum
 
@@ -12,9 +11,11 @@ class RequestTransactionModel(BaseModel):
 
 
 class TransactionModel(BaseModel):
-    id: Optional[int]
-    user_id: Optional[int] = None
-    currency: Optional[CurrencyEnum] = None
-    amount: Optional[float] = None
-    status: Optional[TransactionStatusEnum] = None
-    created: Optional[datetime] = None
+    id: int | None
+    user_id: int | None = None
+    currency: CurrencyEnum | None = None
+    amount: float | None = None
+    status: TransactionStatusEnum | None = None
+    created: datetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
