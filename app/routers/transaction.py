@@ -2,23 +2,12 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_async_session
-from app.core.enums import CurrencyEnum, TransactionStatusEnum
-from app.core.exceptions import (
-    BadRequestDataException,
-    CreateTransactionForBlockedUserException,
-    NegativeBalanceException,
-    TransactionAlreadyRollbackedException,
-    TransactionDoesNotBelongToUserException,
-    TransactionNotExistsException,
-    UpdateTransactionForBlockedUserException,
-    UserNotExistsException,
-)
-from app.models.transaction import Transaction
-from app.models.user import User, UserBalance
+from app.core.uow import UnitOfWork
+from app.repositories.transaction import TransactionRepository
+from app.repositories.user import UserRepository
 from app.schemas.transaction import RequestTransactionModel, TransactionModel
 from app.services.queries import (
     get_not_rollbacked_deposit_amount,
@@ -29,110 +18,35 @@ from app.services.queries import (
     get_registered_users_count,
     get_transactions_count,
 )
+from app.services.transaction import TransactionService
 
 router = APIRouter()
 
 
-@router.get('/transactions', response_model=Optional[list[TransactionModel]] | None, status_code=status.HTTP_200_OK)
-async def get_transactions(user_id: Optional[int] = None, session: AsyncSession = Depends(get_async_session)) -> list[TransactionModel]:
-    q = select(Transaction).order_by(Transaction.created.desc())
-    if user_id:
-        q = q.where(Transaction.user_id == user_id)
+def get_transaction_service(session: AsyncSession = Depends(get_async_session)) -> TransactionService:
+    uow = UnitOfWork(session=session)
+    user_repo = UserRepository(session=session)
+    transaction_repo = TransactionRepository(session=session)
+    return TransactionService(uow=uow, user_repo=user_repo, transaction_repo=transaction_repo)
 
-    transactions = await session.execute(q)
-    transactions = transactions.scalars()
-    results = []
-    for t in transactions:
-        result = TransactionModel(
-            **{
-                'id': t.id,
-                'user_id': t.user_id,
-                'currency': CurrencyEnum(t.currency),
-                'amount': t.amount,
-                'status': TransactionStatusEnum(t.status),
-                'created': t.created,
-            }
-        )
-        results.append(result)
-    return results
+
+@router.get('/transactions', response_model=list[TransactionModel] | None, status_code=status.HTTP_200_OK)
+async def get_transactions(
+    user_id: Optional[int] = None, service: TransactionService = Depends(get_transaction_service)
+) -> list[TransactionModel]:
+    return await service.get_transactions(user_id=user_id)
 
 
 @router.post('/{user_id}/transactions', response_model=Optional[TransactionModel] | None, status_code=status.HTTP_200_OK)
-async def post_transaction(user_id: int, transaction: RequestTransactionModel, session: AsyncSession = Depends(get_async_session)):
-    if user_id < 0:
-        raise BadRequestDataException(detail='Unprocessable data in request')
-    if transaction.currency not in {str(x) for x in CurrencyEnum}:
-        raise BadRequestDataException(detail='Currency does not exist')
-    if transaction.amount == 0:
-        raise BadRequestDataException(detail='Transaction can not have zero amount')
-
-    db_user = await session.execute(select(User).where(User.id == user_id))
-    db_user = db_user.scalar()
-    if not db_user:
-        raise UserNotExistsException(detail='User with id=`{0}` does not exist'.format(user_id))
-    if db_user.status != 'ACTIVE':
-        raise CreateTransactionForBlockedUserException(detail='User with id=`{0}` is blocked'.format(user_id))
-
-    db_user_balance = await session.execute(
-        select(UserBalance).where((UserBalance.user_id == user_id) & (UserBalance.currency == transaction.currency))
-    )
-    db_user_balance = db_user_balance.scalar()
-    if float(db_user_balance.amount) + transaction.amount < 0:
-        raise NegativeBalanceException(detail='Negative balance')
-
-    await session.execute(update(UserBalance).values(**{'amount': transaction.amount}).where(UserBalance.id == db_user_balance.id))
-    await session.commit()
-    await session.execute(
-        insert(Transaction).values(
-            **{
-                'user_id': db_user.id,
-                'currency': transaction.currency,
-                'amount': transaction.amount,
-                'status': 'PROCESSED',
-                'created': datetime.utcnow(),
-            }
-        )
-    )
-    await session.commit()
+async def post_transaction(
+    user_id: int, transaction: RequestTransactionModel, service: TransactionService = Depends(get_transaction_service)
+):
+    return await service.add_transaction(user_id=user_id, transaction=transaction)
 
 
 @router.patch('/{user_id}/transactions/{transaction_id}', response_model=Optional[TransactionModel] | None)
-async def patch_rollback_transaction(user_id: int, transaction_id: int, session: AsyncSession = Depends(get_async_session)):
-    if user_id < 0 or transaction_id < 0:
-        raise BadRequestDataException(detail='Unprocessable data in request')
-    db_user = await session.execute(select(User).where(User.id == user_id))
-    db_user = db_user.scalar()
-    if not db_user:
-        raise UserNotExistsException(detail='User with id=`{0}` does not exist'.format(user_id))
-    db_transaction = await session.execute(select(Transaction).where(Transaction.id == transaction_id))
-    db_transaction = db_transaction.scalar()
-    if not db_transaction:
-        raise TransactionNotExistsException(detail='Transaction with id=`{0}` does not exist'.format(transaction_id))
-    if db_transaction.user_id != db_user.id:
-        raise TransactionDoesNotBelongToUserException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Transaction with id=`{0}` does not belong to user with id=`{1}`'.format(transaction_id, user_id),
-        )
-    if db_transaction.status == 'ROLLBACKED':
-        raise TransactionAlreadyRollbackedException(detail='Transaction with id=`{0}` is already rollbacked'.format(transaction_id))
-    if db_user.status == 'BLOCKED':
-        raise UpdateTransactionForBlockedUserException(detail='User with id=`{0}` is blocked'.format(user_id))
-
-    db_user_balance = await session.execute(
-        select(UserBalance).where((UserBalance.user_id == user_id) & (UserBalance.currency == db_transaction.currency))
-    )
-    db_user_balance = db_user_balance.scalar()
-    new_amount = float(db_user_balance.amount)
-    if db_transaction.amount < 0:
-        new_amount += abs(float(db_transaction.amount))
-    else:
-        new_amount -= float(db_transaction.amount)
-    if new_amount < 0:
-        raise NegativeBalanceException(detail=f'Negative balance: {new_amount}')
-    await session.execute(update(UserBalance).values(**{'amount': new_amount}).where(UserBalance.id == db_user_balance.id))
-    await session.commit()
-    await session.execute(update(Transaction).values(**{'status': 'ROLLBACKED'}))
-    await session.commit()
+async def patch_rollback_transaction(user_id: int, transaction_id: int, service: TransactionService = Depends(get_transaction_service)):
+    return await service.patch_rollback_transaction(user_id=user_id, transaction_id=transaction_id)
 
 
 @router.get('/transactions/analysis', response_model=Optional[list] | None, status_code=status.HTTP_200_OK)
