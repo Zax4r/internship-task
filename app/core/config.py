@@ -23,7 +23,12 @@ class AnalyticsSettings(_BaseSettings):
     WEEKS_FOR_ANALYTICS: int
 
 
-class Settings(PostgresSettings, AnalyticsSettings):
+class DecimalSettings(_BaseSettings):
+    DECIMAL_TOTAL_DIGITS: int = 12
+    DECIMAL_FRACTIONAL_DIGITS: int = 2
+
+
+class Settings(PostgresSettings, AnalyticsSettings, DecimalSettings):
     pass
 
 

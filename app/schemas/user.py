@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -31,7 +32,7 @@ class RequestUserUpdateModel(BaseModel):
 
 class ResponseUserBalanceModel(BaseModel):
     currency: Optional[CurrencyEnum] = None
-    amount: Optional[float] = None
+    amount: Optional[Decimal] = None
 
 
 class ResponseUserModel(BaseModel):
@@ -55,11 +56,11 @@ class UserBalanceModel(BaseModel):
     id: Optional[int]
     user_id: Optional[int] = None
     currency: Optional[CurrencyEnum] = None
-    amount: Optional[float] = None
+    amount: Optional[Decimal] = None
 
     @field_validator('amount', mode='before')
     @classmethod
-    def validate_not_negative(cls, value: float) -> float:
+    def validate_not_negative(cls, value: Decimal) -> Decimal:
         if value < 0:
             raise ValueError('Amount cannot be negative')
 

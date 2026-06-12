@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from decimal import Decimal
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,5 +60,5 @@ class UserRepository:
     async def update_user(self, user_id: int, new_status: str) -> None:
         await self.session.execute(update(User).values(status=new_status).where(User.id == user_id))
 
-    async def update_user_balance(self, balance_id: int, new_amount: float) -> None:
+    async def update_user_balance(self, balance_id: int, new_amount: Decimal) -> None:
         await self.session.execute(update(UserBalance).values(amount=new_amount).where(UserBalance.id == balance_id))

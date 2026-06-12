@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 
 from app.core.config import settings
 from app.core.enums import EXCHANGE_RATES_TO_USD, CurrencyEnum, TransactionStatusEnum, UserStatusEnum
@@ -61,7 +62,7 @@ class TransactionService:
                     detail=f'User balance user_id=`{user_id}` with currency=`{transaction.currency}` doesn`t exists'
                 )
 
-            new_amount = float(db_user_balance.amount) + transaction.amount
+            new_amount = Decimal(db_user_balance.amount) + transaction.amount
             if new_amount < 0:
                 raise NegativeBalanceException(detail='Negative balance')
 
@@ -99,7 +100,7 @@ class TransactionService:
                     detail=f'User balance user_id=`{user_id}` with currency=`{db_transaction.currency}` doesn`t exists'
                 )
 
-            new_amount = float(db_user_balance.amount) - float(db_transaction.amount)
+            new_amount = Decimal(db_user_balance.amount) - Decimal(db_transaction.amount)
             if new_amount < 0:
                 raise NegativeBalanceException(detail=f'Negative balance: {new_amount}')
             await self.user_repo.update_user_balance(balance_id=db_user_balance.id, new_amount=new_amount)
@@ -120,9 +121,9 @@ class TransactionService:
             registered_and_deposit_users_count = await self.analytics_repo.get_deposit_users_count(dt_gt=dt_gt, dt_lt=dt_lt)
 
             not_rollbacked_deposits = await self.analytics_repo.get_not_rollbacked_deposits(dt_gt=dt_gt, dt_lt=dt_lt)
-            usd_deposits_sum = sum([x.amount * EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)] for x in not_rollbacked_deposits])
+            usd_deposits_sum = sum([x.amount * Decimal(EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)]) for x in not_rollbacked_deposits])
             not_rollbacked_withdraws = await self.analytics_repo.get_not_rollbacked_withdraws(dt_gt=dt_gt, dt_lt=dt_lt)
-            usd_withdraws_sum = sum([x.amount * EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)] for x in not_rollbacked_withdraws])
+            usd_withdraws_sum = sum([x.amount * Decimal(EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)]) for x in not_rollbacked_withdraws])
 
             transactions_count = await self.analytics_repo.get_transactions_count(dt_gt=dt_gt, dt_lt=dt_lt)
             not_rollbacked_transactions_count = await self.analytics_repo.get_not_rollbacked_transactions_count(dt_gt=dt_gt, dt_lt=dt_lt)

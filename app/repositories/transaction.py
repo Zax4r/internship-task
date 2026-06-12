@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from decimal import Decimal
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +27,7 @@ class TransactionRepository:
         transaction = transaction_result.scalar_one_or_none()
         return transaction
 
-    async def add_transaction(self, user_id: int, currency, amount: float) -> Transaction:
+    async def add_transaction(self, user_id: int, currency, amount: Decimal) -> Transaction:
         new_transaction = Transaction(
             user_id=user_id,
             currency=currency,
