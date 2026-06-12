@@ -1,14 +1,28 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
-from pydantic.v1 import root_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.core.enums import CurrencyEnum, UserStatusEnum
 
 
 class RequestUserModel(BaseModel):
     email: str
+
+    @field_validator('email', mode='before')
+    @classmethod
+    def ensure_email(cls, value: str) -> str:
+        email = value.strip()
+        email = ''.join([x for x in email if x != ' '])
+        if len(email) == 0:
+            raise ValueError("Email can't consist entirely of spaces")
+        return email
+
+
+class RequestListUserModel(BaseModel):
+    user_id: Optional[int] = None
+    email: Optional[str] = None
+    user_status: Optional[str] = None
 
 
 class RequestUserUpdateModel(BaseModel):
@@ -34,6 +48,8 @@ class UserModel(BaseModel):
     status: Optional[UserStatusEnum] = None
     created: Optional[datetime] = None
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class UserBalanceModel(BaseModel):
     id: Optional[int]
@@ -41,10 +57,10 @@ class UserBalanceModel(BaseModel):
     currency: Optional[CurrencyEnum] = None
     amount: Optional[float] = None
 
-    @root_validator(pre=True)
-    def validate_not_negative(self, values):
-        if 'amount' in values and values.get('amount'):
-            if values['amount'] < 0:
-                raise ValueError('Amount cannot be negative')
+    @field_validator('amount', mode='before')
+    @classmethod
+    def validate_not_negative(cls, value: float) -> float:
+        if value < 0:
+            raise ValueError('Amount cannot be negative')
 
-        return values
+        return value

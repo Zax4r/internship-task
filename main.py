@@ -1,18 +1,20 @@
-import uvicorn
-from fastapi import Depends, FastAPI
-from sqlalchemy.ext.asyncio import AsyncSession
+from contextlib import asynccontextmanager
 
-from app.core.database import create_db_and_tables, get_async_session
+import uvicorn
+from fastapi import FastAPI
+
+from app.core.database import create_db_and_tables
 from app.routers.transaction import router as transaction_router
 from app.routers.user import router as user_router
 
-app = FastAPI()
 
-
-@app.on_event('startup')
-async def on_startup(session: AsyncSession = Depends(get_async_session)):
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     await create_db_and_tables()
+    yield
 
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
 app.include_router(transaction_router)

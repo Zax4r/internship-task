@@ -1,13 +1,16 @@
-from sqlalchemy import Column, DateTime, Integer, Numeric, String
+from datetime import datetime
+
+from sqlalchemy import DateTime
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
 
 
 class Transaction(Base):
     __tablename__ = 'transaction'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, nullable=False)
-    currency = Column(String, nullable=True)
-    amount = Column(Numeric, nullable=True)
-    status = Column(String, nullable=True)
-    created = Column(DateTime, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int]
+    currency: Mapped[str]
+    amount: Mapped[float]
+    status: Mapped[str]
+    created: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

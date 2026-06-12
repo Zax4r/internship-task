@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.core.enums import CurrencyEnum, TransactionStatusEnum
 
@@ -18,3 +18,5 @@ class TransactionModel(BaseModel):
     amount: Optional[float] = None
     status: Optional[TransactionStatusEnum] = None
     created: Optional[datetime] = None
+
+    model_config = ConfigDict(from_attributes=True)
