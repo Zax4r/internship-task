@@ -53,3 +53,8 @@ select = [
 [tool.ruff.format]
 quote-style = 'single'
 indent-style = 'space'
+
+[tool.mypy]
+plugins = [
+    "pydantic.mypy"
+]
