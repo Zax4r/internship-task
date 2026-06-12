@@ -29,6 +29,6 @@ async def post_user(user: RequestUserModel, service: UserService = Depends(get_u
     return await service.add_user(user)
 
 
-@router.patch('/users/{user_id}', response_model=UserModel | None)
+@router.patch('/users/{user_id}', response_model=UserModel)
 async def patch_user(user_id: int, user: RequestUserUpdateModel, service: UserService = Depends(get_user_service)) -> UserModel:
     return await service.update_user(user_id, user)
