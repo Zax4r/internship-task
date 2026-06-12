@@ -8,7 +8,14 @@ from app.core.exceptions import (
 )
 from app.core.uow import UnitOfWork
 from app.repositories.user import UserRepository
-from app.schemas.user import RequestListUserModel, RequestUserModel, RequestUserUpdateModel, ResponseUserModel, UserModel
+from app.schemas.user import (
+    RequestListUserModel,
+    RequestUserModel,
+    RequestUserUpdateModel,
+    ResponseUserBalanceModel,
+    ResponseUserModel,
+    UserModel,
+)
 
 
 class UserService:
@@ -26,10 +33,11 @@ class UserService:
 
         results = []
         for user in users:
-            balances = user.user_balance
-            balances = sorted([{'currency': b.currency, 'amount': b.amount} for b in balances], key=lambda x: x['amount'])
+            user_balances = user.user_balance
+            balances = [ResponseUserBalanceModel(currency=CurrencyEnum(b.currency), amount=b.amount) for b in user_balances]
+            balances_sorted = sorted(balances, key=lambda x: x.amount)  # type: ignore[arg-type, return-value]
             result = ResponseUserModel(
-                id=user.id, email=user.email, status=UserStatusEnum(user.status), created=user.created, balances=balances
+                id=user.id, email=user.email, status=UserStatusEnum(user.status), created=user.created, balances=balances_sorted
             )
             results.append(result)
 
