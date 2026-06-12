@@ -22,7 +22,7 @@ class UserRepository:
             query = query.where(User.status == user_status)
         users_result = await self.session.execute(query)
         users = users_result.scalars().all()
-        return users
+        return list(users)
 
     async def get_user_by_email(self, email: str) -> User | None:
         query = select(User).options(selectinload(User.user_balance)).where(User.email == email)
@@ -36,7 +36,7 @@ class UserRepository:
         user = users_result.scalar_one_or_none()
         return user
 
-    async def get_user_balance(self, user_id: int, currency: str) -> UserBalance:
+    async def get_user_balance(self, user_id: int, currency: str) -> UserBalance | None:
         query = select(UserBalance).where((UserBalance.user_id == user_id) & (UserBalance.currency == currency))
         balances_result = await self.session.execute(query)
         balance = balances_result.scalar_one_or_none()

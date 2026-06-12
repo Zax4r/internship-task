@@ -11,14 +11,14 @@ class TransactionRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_transactions(self, user_id: int | None) -> list[Transaction] | None:
+    async def get_transactions(self, user_id: int | None) -> list[Transaction]:
         query = select(Transaction).order_by(Transaction.created.desc())
         if user_id:
             query = query.where(Transaction.user_id == user_id)
 
         transaction_result = await self.session.execute(query)
         transactions = transaction_result.scalars().all()
-        return transactions
+        return list(transactions)
 
     async def get_transaction_by_id(self, transaction_id: int) -> Transaction | None:
         query = select(Transaction).where(Transaction.id == transaction_id)
