@@ -10,7 +10,7 @@ from app.core.exceptions import (
     TransactionDoesNotBelongToUserException,
     TransactionNotExistsException,
     UpdateTransactionForBlockedUserException,
-    UserBalanceNotExistsException,
+    UserBalanceDoesNotExistException,
     UserNotExistsException,
 )
 from app.core.uow import UnitOfWork
@@ -57,7 +57,7 @@ class TransactionService:
 
             db_user_balance = await self.user_repo.get_user_balance(user_id=user_id, currency=transaction.currency)
             if not db_user_balance:
-                raise UserBalanceNotExistsException(
+                raise UserBalanceDoesNotExistException(
                     detail=f'User balance user_id=`{user_id}` with currency=`{transaction.currency}` doesn`t exists'
                 )
 
@@ -95,7 +95,7 @@ class TransactionService:
 
             db_user_balance = await self.user_repo.get_user_balance(user_id=user_id, currency=db_transaction.currency)
             if not db_user_balance:
-                raise UserBalanceNotExistsException(
+                raise UserBalanceDoesNotExistException(
                     detail=f'User balance user_id=`{user_id}` with currency=`{db_transaction.currency}` doesn`t exists'
                 )
 

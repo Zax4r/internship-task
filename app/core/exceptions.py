@@ -37,7 +37,7 @@ class UserNotExistsException(NotFoundException):
     pass
 
 
-class UserBalanceNotExistsException(NotFoundException):
+class UserBalanceDoesNotExistException(NotFoundException):
     pass
 
 
