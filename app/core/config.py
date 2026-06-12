@@ -20,7 +20,7 @@ class PostgresSettings(_BaseSettings):
 
 
 class AnalyticsSettings(_BaseSettings):
-    WEEKS_FOR_ANALYTICS: int
+    WEEKS_FOR_ANALYTICS: int = 52
 
 
 class DecimalSettings(_BaseSettings):
