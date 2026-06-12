@@ -19,7 +19,11 @@ class PostgresSettings(_BaseSettings):
         return f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'
 
 
-class Settings(PostgresSettings):
+class AnalyticsSettings(_BaseSettings):
+    WEEKS_FOR_ANALYTICS: int
+
+
+class Settings(PostgresSettings, AnalyticsSettings):
     pass
 
 
