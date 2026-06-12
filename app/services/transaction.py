@@ -114,23 +114,25 @@ class TransactionService:
     async def transaction_analysis(self) -> list[AnalysisModel]:
         results = []
         for i_week in range(1, settings.WEEKS_FOR_ANALYTICS + 1):
-            dt_gt = datetime.now(timezone.utc).date() - timedelta(weeks=i_week) + timedelta(days=1)
-            dt_lt = datetime.now(timezone.utc).date() - timedelta(weeks=i_week - 1)
+            dt_gte = datetime.now(timezone.utc).date() - timedelta(weeks=i_week) + timedelta(days=1)
+            dt_lte = datetime.now(timezone.utc).date() - timedelta(weeks=i_week - 1)
 
-            registered_users_count = await self.analytics_repo.get_registered_users_count(dt_gt=dt_gt, dt_lt=dt_lt)
-            registered_and_deposit_users_count = await self.analytics_repo.get_deposit_users_count(dt_gt=dt_gt, dt_lt=dt_lt)
+            registered_users_count = await self.analytics_repo.get_registered_users_count(dt_gte=dt_gte, dt_lte=dt_lte)
+            registered_and_deposit_users_count = await self.analytics_repo.get_deposit_users_count(dt_gte=dt_gte, dt_lte=dt_lte)
 
-            not_rollbacked_deposits = await self.analytics_repo.get_not_rollbacked_deposits(dt_gt=dt_gt, dt_lt=dt_lt)
+            not_rollbacked_deposits = await self.analytics_repo.get_not_rollbacked_deposits(dt_gte=dt_gte, dt_lte=dt_lte)
             usd_deposits_sum = sum([x.amount * Decimal(EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)]) for x in not_rollbacked_deposits])
-            not_rollbacked_withdraws = await self.analytics_repo.get_not_rollbacked_withdraws(dt_gt=dt_gt, dt_lt=dt_lt)
+            not_rollbacked_withdraws = await self.analytics_repo.get_not_rollbacked_withdraws(dt_gte=dt_gte, dt_lte=dt_lte)
             usd_withdraws_sum = sum([x.amount * Decimal(EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)]) for x in not_rollbacked_withdraws])
 
-            transactions_count = await self.analytics_repo.get_transactions_count(dt_gt=dt_gt, dt_lt=dt_lt)
-            not_rollbacked_transactions_count = await self.analytics_repo.get_not_rollbacked_transactions_count(dt_gt=dt_gt, dt_lt=dt_lt)
+            transactions_count = await self.analytics_repo.get_transactions_count(dt_gte=dt_gte, dt_lte=dt_lte)
+            not_rollbacked_transactions_count = await self.analytics_repo.get_not_rollbacked_transactions_count(
+                dt_gte=dt_gte, dt_lte=dt_lte
+            )
 
             result = AnalysisModel(
-                start_date=dt_gt,
-                end_date=dt_lt,
+                start_date=dt_gte,
+                end_date=dt_lte,
                 registered_users_count=registered_users_count,
                 registered_and_deposit_users_count=registered_and_deposit_users_count,
                 usd_deposits_sum=usd_deposits_sum,
