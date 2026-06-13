@@ -19,16 +19,7 @@ class PostgresSettings(_BaseSettings):
         return f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'
 
 
-class AnalyticsSettings(_BaseSettings):
-    WEEKS_FOR_ANALYTICS: int = 52
-
-
-class DecimalSettings(_BaseSettings):
-    DECIMAL_TOTAL_DIGITS: int = 12
-    DECIMAL_FRACTIONAL_DIGITS: int = 2
-
-
-class Settings(PostgresSettings, AnalyticsSettings, DecimalSettings):
+class Settings(PostgresSettings):
     pass
 
 

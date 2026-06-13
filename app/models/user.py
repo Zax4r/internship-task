@@ -4,7 +4,7 @@ from decimal import Decimal
 from sqlalchemy import DateTime, ForeignKey, Numeric, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.config import settings
+from app.core.constants import DECIMAL_FRACTIONAL_DIGITS, DECIMAL_TOTAL_DIGITS
 from app.core.database import Base
 
 
@@ -24,7 +24,7 @@ class UserBalance(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     currency: Mapped[str]
-    amount: Mapped[Decimal] = mapped_column(Numeric(settings.DECIMAL_TOTAL_DIGITS, settings.DECIMAL_FRACTIONAL_DIGITS))
+    amount: Mapped[Decimal] = mapped_column(Numeric(DECIMAL_TOTAL_DIGITS, DECIMAL_FRACTIONAL_DIGITS))
     created: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     owner: Mapped['User'] = relationship('User', back_populates='user_balance')
