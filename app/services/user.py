@@ -1,3 +1,6 @@
+from loguru import logger
+from sqlalchemy.exc import NoResultFound
+
 from app.core.enums import CurrencyEnum, UserStatusEnum
 from app.core.exceptions import (
     BadRequestDataException,
@@ -44,6 +47,7 @@ class UserService:
         return results
 
     async def add_user(self, user: RequestUserModel) -> UserModel:
+        logger.info(f'Adding user with email=`{user.email}`')
         async with self.uow:
             db_user = await self.user_repo.get_user_by_email(email=user.email)
             if db_user:
@@ -53,18 +57,21 @@ class UserService:
             db_user = await self.user_repo.add_user(email=user.email)
             for currency in currencies:
                 await self.user_repo.add_user_balance(user_id=db_user.id, currency=currency)
+        logger.info(f'User with email=`{user.email}` added')
 
         result = UserModel.model_validate(db_user)
         return result
 
     async def update_user(self, user_id: int, user: RequestUserUpdateModel) -> UserModel:
+        logger.info(f'Updating user with id=`{user_id}`')
         async with self.uow:
             if user_id < 0:
                 raise BadRequestDataException(detail='Unprocessable data in request')
 
-            db_user = await self.user_repo.get_user_by_id(user_id=user_id)
-            if db_user is None:
-                raise UserNotExistsException(detail=f'User with id=`{user_id}` does not exist')
+            try:
+                db_user = await self.user_repo.get_user_by_id(user_id=user_id)
+            except NoResultFound as exc:
+                raise UserNotExistsException(detail=f'User with id=`{user_id}` does not exist') from exc
 
             if db_user.status == UserStatusEnum.BLOCKED and user.status == UserStatusEnum.BLOCKED:
                 raise UserAlreadyBlockedException(detail=f'User with id=`{user_id}` is already blocked')
@@ -73,6 +80,7 @@ class UserService:
 
             await self.user_repo.update_user(user_id, user.status)
             db_user = await self.user_repo.get_user_by_id(user_id=user_id)
+        logger.info(f'User with id=`{user_id}` updated')
 
         result = UserModel.model_validate(db_user)
         return result

@@ -31,16 +31,16 @@ class UserRepository:
         user = users_result.scalar_one_or_none()
         return user
 
-    async def get_user_by_id(self, user_id: int) -> User | None:
+    async def get_user_by_id(self, user_id: int) -> User:
         query = select(User).options(selectinload(User.user_balance)).where(User.id == user_id)
         users_result = await self.session.execute(query)
-        user = users_result.scalar_one_or_none()
+        user = users_result.scalar_one()
         return user
 
-    async def get_user_balance(self, user_id: int, currency: str) -> UserBalance | None:
+    async def get_user_balance(self, user_id: int, currency: str) -> UserBalance:
         query = select(UserBalance).where((UserBalance.user_id == user_id) & (UserBalance.currency == currency))
         balances_result = await self.session.execute(query)
-        balance = balances_result.scalar_one_or_none()
+        balance = balances_result.scalar_one()
         return balance
 
     async def add_user(self, email: str) -> User:

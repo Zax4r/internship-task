@@ -21,10 +21,10 @@ class TransactionRepository:
         transactions = transaction_result.scalars().all()
         return list(transactions)
 
-    async def get_transaction_by_id(self, transaction_id: int) -> Transaction | None:
+    async def get_transaction_by_id(self, transaction_id: int) -> Transaction:
         query = select(Transaction).where(Transaction.id == transaction_id)
         transaction_result = await self.session.execute(query)
-        transaction = transaction_result.scalar_one_or_none()
+        transaction = transaction_result.scalar_one()
         return transaction
 
     async def add_transaction(self, user_id: int, currency, amount: Decimal) -> Transaction:
