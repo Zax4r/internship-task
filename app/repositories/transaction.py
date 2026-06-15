@@ -41,4 +41,6 @@ class TransactionRepository:
         return new_transaction
 
     async def update_transaction(self, transaction_id: int, new_status: str) -> None:
-        await self.session.execute(update(Transaction).values(status=new_status).where(Transaction.id == transaction_id))
+        await self.session.execute(
+            update(Transaction).values(status=new_status).where(Transaction.id == transaction_id)
+        )

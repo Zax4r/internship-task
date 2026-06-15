@@ -5,7 +5,12 @@ from loguru import logger
 from sqlalchemy.exc import NoResultFound
 
 from app.core.constants import WEEKS_FOR_ANALYTICS
-from app.core.enums import EXCHANGE_RATES_TO_USD, CurrencyEnum, TransactionStatusEnum, UserStatusEnum
+from app.core.enums import (
+    EXCHANGE_RATES_TO_USD,
+    CurrencyEnum,
+    TransactionStatusEnum,
+    UserStatusEnum,
+)
 from app.core.exceptions import (
     BadRequestDataException,
     CreateTransactionForBlockedUserException,
@@ -29,7 +34,11 @@ from app.schemas.transaction import RequestTransactionModel, TransactionModel
 
 class TransactionService:
     def __init__(
-        self, uow: UnitOfWork, user_repo: UserRepository, transaction_repo: TransactionRepository, analytics_repo: AnalyticsRepository
+        self,
+        uow: UnitOfWork,
+        user_repo: UserRepository,
+        transaction_repo: TransactionRepository,
+        analytics_repo: AnalyticsRepository,
     ):
         self.uow = uow
         self.user_repo = user_repo
@@ -76,7 +85,9 @@ class TransactionService:
                 raise NegativeBalanceException(detail='Negative balance')
 
             await self.user_repo.update_user_balance(balance_id=db_user_balance.id, new_amount=new_amount)
-            new_transaction = await self.transaction_repo.add_transaction(user_id, transaction.currency, transaction.amount)
+            new_transaction = await self.transaction_repo.add_transaction(
+                user_id, transaction.currency, transaction.amount
+            )
         logger.info(f'Transaction with user_id=`{user_id}` added')
 
         result = TransactionModel.model_validate(new_transaction)
@@ -96,12 +107,16 @@ class TransactionService:
             try:
                 db_transaction = await self.transaction_repo.get_transaction_by_id(transaction_id)
             except NoResultFound as exc:
-                raise TransactionNotExistsException(detail=f'Transaction with id=`{transaction_id}` does not exist') from exc
+                raise TransactionNotExistsException(
+                    detail=f'Transaction with id=`{transaction_id}` does not exist'
+                ) from exc
 
             self._validate_transaction(db_transaction=db_transaction, db_user=db_user)
 
             try:
-                db_user_balance = await self.user_repo.get_user_balance(user_id=user_id, currency=db_transaction.currency)
+                db_user_balance = await self.user_repo.get_user_balance(
+                    user_id=user_id, currency=db_transaction.currency
+                )
             except NoResultFound as exc:
                 raise UserBalanceDoesNotExistException(
                     detail=f'User balance user_id=`{user_id}` with currency=`{db_transaction.currency}` doesn`t exists'
@@ -129,12 +144,22 @@ class TransactionService:
             dt_to = datetime.now(timezone.utc).date() - timedelta(weeks=i_week - 1)
 
             registered_users_count = await self.analytics_repo.get_registered_users_count(dt_from=dt_from, dt_to=dt_to)
-            registered_and_deposit_users_count = await self.analytics_repo.get_deposit_users_count(dt_from=dt_from, dt_to=dt_to)
+            registered_and_deposit_users_count = await self.analytics_repo.get_deposit_users_count(
+                dt_from=dt_from, dt_to=dt_to
+            )
 
-            not_rollbacked_deposits = await self.analytics_repo.get_not_rollbacked_deposits(dt_from=dt_from, dt_to=dt_to)
-            usd_deposits_sum = sum([x.amount * Decimal(EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)]) for x in not_rollbacked_deposits])
-            not_rollbacked_withdraws = await self.analytics_repo.get_not_rollbacked_withdraws(dt_from=dt_from, dt_to=dt_to)
-            usd_withdraws_sum = sum([x.amount * Decimal(EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)]) for x in not_rollbacked_withdraws])
+            not_rollbacked_deposits = await self.analytics_repo.get_not_rollbacked_deposits(
+                dt_from=dt_from, dt_to=dt_to
+            )
+            usd_deposits_sum = sum(
+                [x.amount * Decimal(EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)]) for x in not_rollbacked_deposits]
+            )
+            not_rollbacked_withdraws = await self.analytics_repo.get_not_rollbacked_withdraws(
+                dt_from=dt_from, dt_to=dt_to
+            )
+            usd_withdraws_sum = sum(
+                [x.amount * Decimal(EXCHANGE_RATES_TO_USD[CurrencyEnum(x.currency)]) for x in not_rollbacked_withdraws]
+            )
 
             transactions_count = await self.analytics_repo.get_transactions_count(dt_from=dt_from, dt_to=dt_to)
             not_rollbacked_transactions_count = await self.analytics_repo.get_not_rollbacked_transactions_count(
@@ -160,6 +185,8 @@ class TransactionService:
                 detail=f'Transaction with id=`{db_transaction.id}` does not belong to user with id=`{db_user.id}`'
             )
         if db_transaction.status == TransactionStatusEnum.roll_backed:
-            raise TransactionAlreadyRollbackedException(detail=f'Transaction with id=`{db_transaction.id}` is already rollbacked')
+            raise TransactionAlreadyRollbackedException(
+                detail=f'Transaction with id=`{db_transaction.id}` is already rollbacked'
+            )
         if db_user.status == UserStatusEnum.BLOCKED:
             raise UpdateTransactionForBlockedUserException(detail=f'User with id=`{db_user.id}` is blocked')

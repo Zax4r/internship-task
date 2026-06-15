@@ -6,7 +6,10 @@ class AppException(HTTPException):
     default_detail = 'Internal server error'
 
     def __init__(self, status_code: int | None = None, detail: str | None = None):
-        super().__init__(status_code=status_code or self.default_status_code, detail=detail or self.default_detail)
+        super().__init__(
+            status_code=status_code or self.default_status_code,
+            detail=detail or self.default_detail,
+        )
 
 
 class BadRequestException(AppException):

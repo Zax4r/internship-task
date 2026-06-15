@@ -13,7 +13,9 @@ class AnalyticsRepository:
         self.session = session
 
     async def get_registered_users_count(self, dt_from: date, dt_to: date) -> int:
-        q = select(func.count(distinct(User.id))).where((User.created >= dt_from) & (User.created <= dt_to + timedelta(days=1)))
+        q = select(func.count(distinct(User.id))).where(
+            (User.created >= dt_from) & (User.created <= dt_to + timedelta(days=1))
+        )
         registered_users_result = await self.session.execute(q)
         registered_users = registered_users_result.scalar_one()
         return registered_users

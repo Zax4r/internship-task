@@ -37,10 +37,16 @@ class UserService:
         results = []
         for user in users:
             user_balances = user.user_balance
-            balances = [ResponseUserBalanceModel(currency=CurrencyEnum(b.currency), amount=b.amount) for b in user_balances]
+            balances = [
+                ResponseUserBalanceModel(currency=CurrencyEnum(b.currency), amount=b.amount) for b in user_balances
+            ]
             balances_sorted = sorted(balances, key=lambda x: x.amount)  # type: ignore[arg-type, return-value]
             result = ResponseUserModel(
-                id=user.id, email=user.email, status=UserStatusEnum(user.status), created=user.created, balances=balances_sorted
+                id=user.id,
+                email=user.email,
+                status=UserStatusEnum(user.status),
+                created=user.created,
+                balances=balances_sorted,
             )
             results.append(result)
 

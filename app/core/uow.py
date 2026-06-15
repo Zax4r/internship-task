@@ -16,7 +16,12 @@ class UnitOfWork:
     async def __aenter__(self) -> 'UnitOfWork':
         return self
 
-    async def __aexit__(self, exc_type: type[BaseException] | None, exc: BaseException | None, tb: TracebackType | None) -> None:
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
         if exc_type:
             await self.rollback()
         else:

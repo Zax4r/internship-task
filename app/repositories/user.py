@@ -13,7 +13,9 @@ class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_users(self, user_id: int | None = None, email: str | None = None, user_status: str | None = None) -> list[User]:
+    async def get_users(
+        self, user_id: int | None = None, email: str | None = None, user_status: str | None = None
+    ) -> list[User]:
         query = select(User).options(selectinload(User.user_balance)).order_by(User.created.desc())
         if user_id is not None:
             query = query.where(User.id == user_id)
