@@ -1,8 +1,10 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class _BaseSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env')
+    model_config = SettingsConfigDict(env_file=os.getenv('ENV_FILE', '.env'))
 
 
 class PostgresSettings(_BaseSettings):

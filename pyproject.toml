@@ -15,6 +15,7 @@ aiosqlite = "^0.20.0"
 pre-commit = "^4.6.0"
 pydantic-settings = "^2.14.1"
 asyncpg = "^0.31.0"
+loguru = "^0.7.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -39,7 +40,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-line-length = 140
+line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]
@@ -53,3 +54,8 @@ select = [
 [tool.ruff.format]
 quote-style = 'single'
 indent-style = 'space'
+
+[tool.mypy]
+plugins = [
+    "pydantic.mypy"
+]

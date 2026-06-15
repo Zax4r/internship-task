@@ -5,8 +5,11 @@ class AppException(HTTPException):
     default_status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     default_detail = 'Internal server error'
 
-    def __init__(self, status_code: int = None, detail: str = None):
-        super().__init__(status_code=status_code or self.default_status_code, detail=detail or self.default_detail)
+    def __init__(self, status_code: int | None = None, detail: str | None = None):
+        super().__init__(
+            status_code=status_code or self.default_status_code,
+            detail=detail or self.default_detail,
+        )
 
 
 class BadRequestException(AppException):
@@ -34,6 +37,10 @@ class UserAlreadyExistsException(ConflictException):
 
 
 class UserNotExistsException(NotFoundException):
+    pass
+
+
+class UserBalanceDoesNotExistException(NotFoundException):
     pass
 
 

@@ -6,7 +6,12 @@ build:
 run:
 	docker compose up
 
-.PHONE: stop
+.PHONY: local
+local:
+	docker compose -f docker-compose.dev.yml up -d
+	ENV_FILE=.env.local uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+
+.PHONY: stop
 stop:
 	docker compose down
 
@@ -14,4 +19,4 @@ stop:
 lint:
 	poetry run ruff format .
 	poetry run ruff check . --fix
- 	#poetry run mypy .
+	poetry run mypy .
