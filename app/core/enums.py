@@ -1,6 +1,10 @@
 from enum import StrEnum
 
 
+class KafkaTopicEnum(StrEnum):
+    ANALYTICS = 'analytics-topic'
+
+
 class CurrencyEnum(StrEnum):
     USD = 'USD'
     EUR = 'EUR'

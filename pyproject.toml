@@ -16,6 +16,8 @@ pre-commit = "^4.6.0"
 pydantic-settings = "^2.14.1"
 asyncpg = "^0.31.0"
 loguru = "^0.7.3"
+aiokafka = "^0.14.0"
+orjson = "^3.11.9"
 
 
 [tool.poetry.group.dev.dependencies]
