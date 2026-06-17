@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from typing import Any
 
 from sqlalchemy import distinct, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.enums import TransactionStatusEnum
 from app.models.transaction import Transaction
 from app.models.user import User
+from app.repositories.cache import CacheRepository
 
 
 class AnalyticsRepository:
@@ -75,3 +77,18 @@ class AnalyticsRepository:
         transactions_result = await self.session.execute(q)
         transactions = transactions_result.scalar_one()
         return transactions
+
+
+class AnalyticsCacheRepository:
+    ANALYTICS_CACHE_KEY = 'analytics:report'
+    ANALYTICS_TTL = 3600
+
+    def __init__(self, cache: CacheRepository):
+        self.cache = cache
+
+    async def get_report(self) -> list[dict[str, Any]] | None:
+        data = await self.cache.get(self.ANALYTICS_CACHE_KEY)
+        return data
+
+    async def set_report(self, report: list[dict[str, Any]]) -> None:
+        await self.cache.set(self.ANALYTICS_CACHE_KEY, report, self.ANALYTICS_TTL)

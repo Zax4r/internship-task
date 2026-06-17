@@ -8,6 +8,7 @@ from loguru import logger
 
 from app.consumers.analytics import get_analytics_consumer
 from app.core.database import create_db_and_tables
+from app.core.exceptions import AppException
 from app.core.logger import setup_logging
 from app.routers.analytics import router as analytics_router
 from app.routers.transaction import router as transaction_router
@@ -28,9 +29,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-@app.exception_handler(Exception)
+@app.exception_handler(AppException)
 async def custom_http_exception_handler(request: Request, exc: HTTPException) -> Response:
-    logger.error(f'Unexpected error: {exc.detail}', exc_info=True)
+    logger.error(f'Unexpected error: {exc}', exc_info=True)
     return await http_exception_handler(request, exc)
 
 

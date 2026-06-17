@@ -28,9 +28,20 @@ class KafkaSettings(_BaseSettings):
         return f'{self.KAFKA_BOOTSTRAP_HOST}:{self.KAFKA_BOOTSTRAP_PORT}'
 
 
+class RedisSettings(_BaseSettings):
+    REDIS_PASSWORD: str
+    REDIS_HOST: str
+    REDIS_PORT: str
+
+    @property
+    def REDIS_URL(self) -> str:
+        return f'redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/0'
+
+
 class Settings(
     PostgresSettings,
     KafkaSettings,
+    RedisSettings,
 ):
     pass
 

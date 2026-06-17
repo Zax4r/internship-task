@@ -3,8 +3,10 @@ from typing import Any
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.core.redis import redis_client
 from app.core.uow import UnitOfWork
-from app.repositories.analytics import AnalyticsRepository
+from app.repositories.analytics import AnalyticsCacheRepository, AnalyticsRepository
+from app.repositories.cache import CacheRepository
 from app.services.analytics import AnalyticsService
 
 
@@ -20,7 +22,8 @@ class AnalyticsMessageHandler:
                 async with self.session_factory() as session:
                     uow = UnitOfWork(session=session)
                     repo = AnalyticsRepository(session=session)
-                    service = AnalyticsService(uow=uow, analytics_repo=repo)
+                    cache_repo = AnalyticsCacheRepository(CacheRepository(redis_client))
+                    service = AnalyticsService(uow=uow, analytics_repo=repo, cache_repo=cache_repo)
                     data = await service.perform_analysis()
                     logger.info(f'Analysis done {data[0]} , {data[1]} results')
             else:

@@ -18,6 +18,7 @@ asyncpg = "^0.31.0"
 loguru = "^0.7.3"
 aiokafka = "^0.14.0"
 orjson = "^3.11.9"
+redis = "^8.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -61,3 +62,4 @@ indent-style = 'space'
 plugins = [
     "pydantic.mypy"
 ]
+ignore_missing_imports = true

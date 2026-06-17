@@ -130,7 +130,7 @@ class TransactionService:
         result = TransactionModel.model_validate(new_db_transaction)
         return result
 
-    def _validate_transaction(self, db_transaction: Transaction, db_user: User):
+    def _validate_transaction(self, db_transaction: Transaction, db_user: User) -> None:
         if db_transaction.user_id != db_user.id:
             raise TransactionDoesNotBelongToUserException(
                 detail=f'Transaction with id=`{db_transaction.id}` does not belong to user with id=`{db_user.id}`'
