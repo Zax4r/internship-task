@@ -2,7 +2,6 @@ from aiokafka import AIOKafkaConsumer
 
 from app.core.config import settings
 from app.core.constants import AVRO_TEST_SCHEMA_PATH
-from app.core.database import async_session_maker
 from app.core.enums import KafkaTopicEnum
 from app.handlers.avro_example import AvroExampleHandler
 from app.services.coders.avr import AvroCoder
@@ -33,5 +32,5 @@ class AvroConsumer:
 
 
 async def get_avro_consumer() -> AvroConsumer:
-    handler = AvroExampleHandler(session_factory=async_session_maker)
+    handler = AvroExampleHandler()
     return AvroConsumer(handler=handler)

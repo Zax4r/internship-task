@@ -17,16 +17,13 @@ class AnalyticsMessageHandler:
     async def __call__(self, payload: dict[str, Any]) -> None:
         action = payload.get('action')
         logger.info(f'Handling analytics action: {action}')
-        try:
-            if action == 'run_analytics':
-                async with self.session_factory() as session:
-                    uow = UnitOfWork(session=session)
-                    repo = AnalyticsRepository(session=session)
-                    cache_repo = AnalyticsCacheRepository(CacheRepository(redis_client))
-                    service = AnalyticsService(uow=uow, analytics_repo=repo, cache_repo=cache_repo)
-                    data = await service.perform_analysis()
-                    logger.info(f'Analysis done {data[0]} , {data[1]} results')
-            else:
-                logger.info(f'Unknown analytics action: {action}')
-        except Exception as exc:
-            logger.error(exc)
+        if action == 'run_analytics':
+            async with self.session_factory() as session:
+                uow = UnitOfWork(session=session)
+                repo = AnalyticsRepository(session=session)
+                cache_repo = AnalyticsCacheRepository(CacheRepository(redis_client))
+                service = AnalyticsService(uow=uow, analytics_repo=repo, cache_repo=cache_repo)
+                data = await service.perform_analysis()
+                logger.info(f'Analysis done {data[0]} , {data[1]} results')
+        else:
+            logger.info(f'Unknown analytics action: {action}')
