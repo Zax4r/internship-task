@@ -20,6 +20,7 @@ class AvroConsumer:
         raw_consumer = AIOKafkaConsumer(
             self.topic,
             bootstrap_servers=settings.KAFKA_URL,
+            enable_auto_commit=False,
         )
         coder = AvroCoder(AVRO_TEST_SCHEMA_PATH)
         await raw_consumer.start()

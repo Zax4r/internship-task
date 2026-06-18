@@ -19,6 +19,7 @@ class AnalyticsConsumer:
         raw_consumer = AIOKafkaConsumer(
             self.topic,
             bootstrap_servers=settings.KAFKA_URL,
+            enable_auto_commit=False,
         )
         coder = OrjsonCoder()
         await raw_consumer.start()

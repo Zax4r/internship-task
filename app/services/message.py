@@ -35,5 +35,6 @@ class MessageConsumerService:
                 payload = self.coder.decode(msg.value)
                 logger.info(f'Consumed message topic:{msg.topic} payload:{payload}')
                 await handler(payload)
+                await self.consumer.commit()
             except KafkaError as exc:
                 logger.error('Kafka error while consuming: ', exc_info=str(exc))
