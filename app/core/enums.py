@@ -3,6 +3,7 @@ from enum import StrEnum
 
 class KafkaTopicEnum(StrEnum):
     ANALYTICS = 'analytics-topic'
+    AVRO = 'avro-example-topic'
 
 
 class CurrencyEnum(StrEnum):

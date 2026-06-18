@@ -261,6 +261,22 @@ files = [
 gssauth = ["gssapi ; platform_system != \"Windows\"", "sspilib ; platform_system == \"Windows\""]
 
 [[package]]
+name = "avro"
+version = "1.12.1"
+description = "Avro is a serialization and RPC framework."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "avro-1.12.1-py2.py3-none-any.whl", hash = "sha256:970475dd6457924533966fe761be607c759d5a48390cc8fbed472f7c9a8868f2"},
+    {file = "avro-1.12.1.tar.gz", hash = "sha256:c5b8dd2dd4c10816f0dc127cc29cfd43b5e405cf7e6840e89460a024bf3d098d"},
+]
+
+[package.extras]
+snappy = ["python-snappy"]
+zstandard = ["zstandard"]
+
+[[package]]
 name = "blinker"
 version = "1.9.0"
 description = "Fast, simple object-to-object and broadcast signaling"
@@ -2145,4 +2161,4 @@ dev = ["black (>=19.3b0) ; python_version >= \"3.6\"", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11, <3.13"
-content-hash = "0d50d547dcde671d853f1ece32e9dc7cf37460d8d1faef245c1056ea391f3c87"
+content-hash = "bd27f0bd61489a83572f72438080da73988fdc0d36a69ec3cd81e04a8abbbfd1"

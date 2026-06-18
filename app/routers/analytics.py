@@ -13,6 +13,7 @@ from app.repositories.analytics import AnalyticsCacheRepository, AnalyticsReposi
 from app.repositories.cache import CacheRepository
 from app.schemas.analytics import AnalysisModel
 from app.services.analytics import AnalyticsService
+from app.services.coders.orj import OrjsonCoder
 from app.services.message import MessageProducerService
 
 router = APIRouter()
@@ -20,9 +21,10 @@ router = APIRouter()
 
 async def get_message_producer_service() -> AsyncGenerator[MessageProducerService, None]:
     producer = AIOKafkaProducer(bootstrap_servers=settings.KAFKA_URL)
+    coder = OrjsonCoder()
     await producer.start()
     try:
-        yield MessageProducerService(producer=producer)
+        yield MessageProducerService(coder=coder, producer=producer)
     finally:
         await producer.stop()
 

@@ -1,17 +1,19 @@
 from typing import Any, Awaitable, Callable
 
-import orjson
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from aiokafka.errors import KafkaError, KafkaTimeoutError
 from loguru import logger
 
+from app.services.coders.base import BaseCoder
+
 
 class MessageProducerService:
-    def __init__(self, producer: AIOKafkaProducer):
+    def __init__(self, coder: BaseCoder, producer: AIOKafkaProducer):
+        self.coder = coder
         self.producer = producer
 
     async def send_message(self, topic: str, value: dict[Any, Any]) -> None:
-        payload = orjson.dumps(value)
+        payload = self.coder.encode(value)
         try:
             await self.producer.send(topic=topic, value=payload)
             logger.info(f'Produced message topic:{topic} payload: {value}')
@@ -20,7 +22,8 @@ class MessageProducerService:
 
 
 class MessageConsumerService:
-    def __init__(self, consumer: AIOKafkaConsumer):
+    def __init__(self, coder: BaseCoder, consumer: AIOKafkaConsumer):
+        self.coder = coder
         self.consumer = consumer
 
     async def consume(
@@ -29,10 +32,8 @@ class MessageConsumerService:
     ) -> None:
         async for msg in self.consumer:
             try:
-                payload = orjson.loads(msg.value)
+                payload = self.coder.decode(msg.value)
                 logger.info(f'Consumed message topic:{msg.topic} payload:{payload}')
                 await handler(payload)
-            except orjson.JSONDecodeError as exc:
-                logger.error('Failed to decode message: ', exc_info=str(exc))
             except KafkaError as exc:
                 logger.error('Kafka error while consuming: ', exc_info=str(exc))

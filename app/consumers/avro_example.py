@@ -1,17 +1,18 @@
 from aiokafka import AIOKafkaConsumer
 
 from app.core.config import settings
+from app.core.constants import AVRO_TEST_SCHEMA_PATH
 from app.core.database import async_session_maker
 from app.core.enums import KafkaTopicEnum
-from app.handlers.analytics import AnalyticsMessageHandler
-from app.services.coders.orj import OrjsonCoder
+from app.handlers.avro_example import AvroExampleHandler
+from app.services.coders.avr import AvroCoder
 from app.services.message import MessageConsumerService
 
 
-class AnalyticsConsumer:
-    topic = KafkaTopicEnum.ANALYTICS.value
+class AvroConsumer:
+    topic = KafkaTopicEnum.AVRO.value
 
-    def __init__(self, handler: AnalyticsMessageHandler):
+    def __init__(self, handler: AvroExampleHandler):
         self.handler = handler
         self.service: MessageConsumerService | None = None
 
@@ -20,7 +21,7 @@ class AnalyticsConsumer:
             self.topic,
             bootstrap_servers=settings.KAFKA_URL,
         )
-        coder = OrjsonCoder()
+        coder = AvroCoder(AVRO_TEST_SCHEMA_PATH)
         await raw_consumer.start()
         self.service = MessageConsumerService(coder=coder, consumer=raw_consumer)
         await self.service.consume(self.handler)
@@ -30,6 +31,6 @@ class AnalyticsConsumer:
             await self.service.consumer.stop()
 
 
-async def get_analytics_consumer() -> AnalyticsConsumer:
-    handler = AnalyticsMessageHandler(session_factory=async_session_maker)
-    return AnalyticsConsumer(handler=handler)
+async def get_avro_consumer() -> AvroConsumer:
+    handler = AvroExampleHandler(session_factory=async_session_maker)
+    return AvroConsumer(handler=handler)

@@ -82,3 +82,7 @@ class TransactionAlreadyRollbackedException(BadRequestException):
 
 class ReportNotFoundException(NotFoundException):
     pass
+
+
+class TestDataNotFoundException(NotFoundException):
+    pass

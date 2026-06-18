@@ -19,6 +19,7 @@ loguru = "^0.7.3"
 aiokafka = "^0.14.0"
 orjson = "^3.11.9"
 redis = "^8.0.0"
+avro = "^1.12.1"
 
 
 [tool.poetry.group.dev.dependencies]
