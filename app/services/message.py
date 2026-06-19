@@ -1,7 +1,7 @@
-from typing import Any, Awaitable, Callable
+from typing import Any
 
-from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
-from aiokafka.errors import KafkaError, KafkaTimeoutError
+from aiokafka import AIOKafkaProducer
+from aiokafka.errors import KafkaTimeoutError
 from loguru import logger
 
 from app.services.coders.base import BaseCoder
@@ -19,22 +19,3 @@ class MessageProducerService:
             logger.info(f'Produced message topic:{topic} payload: {value}')
         except KafkaTimeoutError as exc:
             raise TimeoutError from exc
-
-
-class MessageConsumerService:
-    def __init__(self, coder: BaseCoder, consumer: AIOKafkaConsumer):
-        self.coder = coder
-        self.consumer = consumer
-
-    async def consume(
-        self,
-        handler: Callable[[dict[str, Any]], Awaitable[Any]],
-    ) -> None:
-        async for msg in self.consumer:
-            try:
-                payload = self.coder.decode(msg.value)
-                logger.info(f'Consumed message topic:{msg.topic} payload:{payload}')
-                await handler(payload)
-                await self.consumer.commit()
-            except KafkaError as exc:
-                logger.error('Kafka error while consuming: ', exc_info=str(exc))

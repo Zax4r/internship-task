@@ -1,36 +1,19 @@
-from aiokafka import AIOKafkaConsumer
-
-from app.core.config import settings
+from app.consumers.base import MessageConsumer
 from app.core.constants import AVRO_TEST_SCHEMA_PATH
 from app.core.enums import KafkaTopicEnum
 from app.handlers.avro_example import AvroExampleHandler
 from app.services.coders.avr import AvroCoder
-from app.services.message import MessageConsumerService
+from app.services.coders.base import BaseCoder
 
 
-class AvroConsumer:
-    topic = KafkaTopicEnum.AVRO.value
+class AvroConsumer(MessageConsumer):
+    _topic = KafkaTopicEnum.AVRO
 
-    def __init__(self, handler: AvroExampleHandler):
-        self.handler = handler
-        self.service: MessageConsumerService | None = None
-
-    async def start(self) -> None:
-        raw_consumer = AIOKafkaConsumer(
-            self.topic,
-            bootstrap_servers=settings.KAFKA_URL,
-            enable_auto_commit=False,
-        )
-        coder = AvroCoder(AVRO_TEST_SCHEMA_PATH)
-        await raw_consumer.start()
-        self.service = MessageConsumerService(coder=coder, consumer=raw_consumer)
-        await self.service.consume(self.handler)
-
-    async def stop(self) -> None:
-        if self.service:
-            await self.service.consumer.stop()
+    def __init__(self, coder: BaseCoder, handler: AvroExampleHandler):
+        super().__init__(coder, handler)
 
 
-async def get_avro_consumer() -> AvroConsumer:
+def get_avro_consumer() -> AvroConsumer:
     handler = AvroExampleHandler()
-    return AvroConsumer(handler=handler)
+    coder = AvroCoder(AVRO_TEST_SCHEMA_PATH)
+    return AvroConsumer(coder=coder, handler=handler)

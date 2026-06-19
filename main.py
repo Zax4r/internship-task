@@ -1,4 +1,3 @@
-import asyncio
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -8,6 +7,7 @@ from loguru import logger
 
 from app.consumers.analytics import get_analytics_consumer
 from app.consumers.avro_example import get_avro_consumer
+from app.consumers.runner import ConsumerRunner
 from app.core.database import create_db_and_tables
 from app.core.exceptions import AppException
 from app.core.logger import setup_logging
@@ -21,15 +21,10 @@ from app.routers.user import router as user_router
 async def lifespan(app: FastAPI):
     setup_logging()
     await create_db_and_tables()
-    analytics_consumer = await get_analytics_consumer()
-    avro_example_consumer = await get_avro_consumer()
-    task = asyncio.create_task(analytics_consumer.start())
-    task2 = asyncio.create_task(avro_example_consumer.start())
+    consumer_runner = ConsumerRunner([get_analytics_consumer(), get_avro_consumer()])
+    await consumer_runner.start()
     yield
-    task.cancel()
-    task2.cancel()
-    await analytics_consumer.stop()
-    await avro_example_consumer.stop()
+    await consumer_runner.stop()
 
 
 app = FastAPI(lifespan=lifespan)
