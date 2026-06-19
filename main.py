@@ -32,7 +32,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.exception_handler(AppException)
 async def custom_http_exception_handler(request: Request, exc: HTTPException) -> Response:
-    logger.error(f'Unexpected error: {exc}', exc_info=True)
+    logger.error('Unexpected error: ', exc_info=str(exc))
     return await http_exception_handler(request, exc)
 
 
