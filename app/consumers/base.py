@@ -39,9 +39,9 @@ class MessageConsumer:
                 await self.consumer.commit()
             except KafkaError as exc:
                 logger.error('Kafka error while consuming: ', exc_info=str(exc))
-            except Exception as e:
-                logger.error(f'Consumer unexpected error committed: {e}')
-                raise e
+            except Exception as exc:
+                logger.error('Consumer unexpected error: ', exc_info=str(exc))
+                raise exc
 
     async def __aenter__(self) -> 'MessageConsumer':
         await self.consumer.start()
