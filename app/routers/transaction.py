@@ -5,10 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_async_session
 from app.core.uow import UnitOfWork
-from app.repositories.analytics import AnalyticsRepository
 from app.repositories.transaction import TransactionRepository
 from app.repositories.user import UserRepository
-from app.schemas.analytics import AnalysisModel
 from app.schemas.transaction import RequestTransactionModel, TransactionModel
 from app.services.transaction import TransactionService
 
@@ -21,12 +19,10 @@ def get_transaction_service(
     uow = UnitOfWork(session=session)
     user_repo = UserRepository(session=session)
     transaction_repo = TransactionRepository(session=session)
-    analytics_repo = AnalyticsRepository(session=session)
     return TransactionService(
         uow=uow,
         user_repo=user_repo,
         transaction_repo=transaction_repo,
-        analytics_repo=analytics_repo,
     )
 
 
@@ -53,10 +49,3 @@ async def patch_rollback_transaction(
     service: TransactionService = Depends(get_transaction_service),
 ) -> TransactionModel:
     return await service.patch_rollback_transaction(user_id=user_id, transaction_id=transaction_id)
-
-
-@router.get('/transactions/analysis', response_model=list[AnalysisModel], status_code=status.HTTP_200_OK)
-async def get_transaction_analysis(
-    service: TransactionService = Depends(get_transaction_service),
-) -> list[AnalysisModel]:
-    return await service.transaction_analysis()

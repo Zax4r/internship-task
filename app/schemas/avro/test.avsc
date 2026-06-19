@@ -1,0 +1,10 @@
+{"namespace": "example.avro",
+ "type": "record",
+ "name": "TestData",
+ "fields": [
+     {"name": "action", "type": "string"},
+     {"name": "name", "type": "string"},
+     {"name": "number",  "type": ["int", "null"]},
+     {"name": "text", "type": ["string", "null"]}
+ ]
+}

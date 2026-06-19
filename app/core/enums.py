@@ -1,6 +1,16 @@
 from enum import StrEnum
 
 
+class KafkaTopicEnum(StrEnum):
+    ANALYTICS = 'analytics-topic'
+    AVRO = 'avro-example-topic'
+
+
+class KafkaGroupEnum(StrEnum):
+    ANALYTICS = 'analytics-group'
+    AVRO = 'avro-example-group'
+
+
 class CurrencyEnum(StrEnum):
     USD = 'USD'
     EUR = 'EUR'

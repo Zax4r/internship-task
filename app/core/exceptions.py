@@ -78,3 +78,11 @@ class UpdateTransactionForBlockedUserException(BadRequestException):
 
 class TransactionAlreadyRollbackedException(BadRequestException):
     pass
+
+
+class ReportNotFoundException(NotFoundException):
+    pass
+
+
+class TestDataNotFoundException(NotFoundException):
+    pass
