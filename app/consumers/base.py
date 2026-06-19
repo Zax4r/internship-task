@@ -6,12 +6,13 @@ from aiokafka.errors import KafkaError
 from loguru import logger
 
 from app.core.config import settings
-from app.core.enums import KafkaTopicEnum
+from app.core.enums import KafkaGroupEnum, KafkaTopicEnum
 from app.services.coders.base import BaseCoder
 
 
 class MessageConsumer:
     _topic: KafkaTopicEnum | None = None
+    _group_id: KafkaGroupEnum | None = None
 
     def __init__(
         self,
@@ -22,6 +23,7 @@ class MessageConsumer:
         self.handler = handler
         self.consumer = AIOKafkaConsumer(
             self._topic,
+            group_id=self._group_id,
             bootstrap_servers=settings.KAFKA_URL,
             enable_auto_commit=False,
         )
@@ -37,6 +39,9 @@ class MessageConsumer:
                 await self.consumer.commit()
             except KafkaError as exc:
                 logger.error('Kafka error while consuming: ', exc_info=str(exc))
+            except Exception as e:
+                logger.error(f'Consumer unexpected error committed: {e}')
+                raise e
 
     async def __aenter__(self) -> 'MessageConsumer':
         await self.consumer.start()

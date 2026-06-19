@@ -1,6 +1,6 @@
 from app.consumers.base import MessageConsumer
 from app.core.constants import AVRO_TEST_SCHEMA_PATH
-from app.core.enums import KafkaTopicEnum
+from app.core.enums import KafkaGroupEnum, KafkaTopicEnum
 from app.handlers.avro_example import AvroExampleHandler
 from app.services.coders.avr import AvroCoder
 from app.services.coders.base import BaseCoder
@@ -8,6 +8,7 @@ from app.services.coders.base import BaseCoder
 
 class AvroConsumer(MessageConsumer):
     _topic = KafkaTopicEnum.AVRO
+    _group_id = KafkaGroupEnum.AVRO
 
     def __init__(self, coder: BaseCoder, handler: AvroExampleHandler):
         super().__init__(coder, handler)

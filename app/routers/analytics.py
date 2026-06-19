@@ -1,32 +1,27 @@
 from typing import AsyncGenerator
 
-from aiokafka import AIOKafkaProducer
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
 from app.core.database import get_async_session
 from app.core.enums import KafkaTopicEnum
 from app.core.redis import redis_client
 from app.core.uow import UnitOfWork
+from app.producers.message import MessageProducer
 from app.repositories.analytics import AnalyticsCacheRepository, AnalyticsRepository
 from app.repositories.cache import CacheRepository
 from app.schemas.analytics import AnalysisModel
 from app.services.analytics import AnalyticsService
 from app.services.coders.orj import OrjsonCoder
-from app.services.message import MessageProducerService
 
 router = APIRouter()
 
 
-async def get_message_producer_service() -> AsyncGenerator[MessageProducerService, None]:
-    producer = AIOKafkaProducer(bootstrap_servers=settings.KAFKA_URL)
+async def get_message_producer_service() -> AsyncGenerator[MessageProducer, None]:
     coder = OrjsonCoder()
-    await producer.start()
-    try:
-        yield MessageProducerService(coder=coder, producer=producer)
-    finally:
-        await producer.stop()
+    message_producer = MessageProducer(coder=coder)
+    async with message_producer as mp:
+        yield mp
 
 
 def get_analytics_service(session: AsyncSession = Depends(get_async_session)) -> AnalyticsService:
@@ -38,7 +33,7 @@ def get_analytics_service(session: AsyncSession = Depends(get_async_session)) ->
 
 @router.get('/analytics-start', response_model=None, status_code=status.HTTP_200_OK)
 async def analytics_start(
-    service: MessageProducerService = Depends(get_message_producer_service),
+    service: MessageProducer = Depends(get_message_producer_service),
 ) -> None:
     payload = {'action': 'run_analytics'}
     return await service.send_message(KafkaTopicEnum.ANALYTICS.value, payload)

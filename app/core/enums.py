@@ -6,6 +6,11 @@ class KafkaTopicEnum(StrEnum):
     AVRO = 'avro-example-topic'
 
 
+class KafkaGroupEnum(StrEnum):
+    ANALYTICS = 'analytics-group'
+    AVRO = 'avro-example-group'
+
+
 class CurrencyEnum(StrEnum):
     USD = 'USD'
     EUR = 'EUR'

@@ -1,6 +1,6 @@
 from app.consumers.base import MessageConsumer
 from app.core.database import async_session_maker
-from app.core.enums import KafkaTopicEnum
+from app.core.enums import KafkaGroupEnum, KafkaTopicEnum
 from app.handlers.analytics import AnalyticsMessageHandler
 from app.services.coders.base import BaseCoder
 from app.services.coders.orj import OrjsonCoder
@@ -8,6 +8,7 @@ from app.services.coders.orj import OrjsonCoder
 
 class AnalyticsConsumer(MessageConsumer):
     _topic = KafkaTopicEnum.ANALYTICS
+    _group_id = KafkaGroupEnum.ANALYTICS
 
     def __init__(self, coder: BaseCoder, handler: AnalyticsMessageHandler):
         super().__init__(coder, handler)
