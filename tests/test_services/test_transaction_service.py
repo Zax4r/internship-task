@@ -133,7 +133,6 @@ async def test_rollback_transaction_service(
 async def test_rollback_transaction_service_fails(
     transaction_service: TransactionService,
     transaction_repo: FakeTransactionRepository,
-    user_repo: FakeUserRepository,
     active_user: User,
 ) -> None:
     transaction = await transaction_repo.add_transaction(
