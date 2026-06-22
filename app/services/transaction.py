@@ -38,7 +38,7 @@ class TransactionService:
         self.user_repo = user_repo
         self.transaction_repo = transaction_repo
 
-    async def get_transactions(self, user_id: int | None) -> list[TransactionModel]:
+    async def get_transactions(self, user_id: int | None = None) -> list[TransactionModel]:
         async with self.uow:
             transactions = await self.transaction_repo.get_transactions(user_id=user_id)
 

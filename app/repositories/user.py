@@ -75,10 +75,7 @@ class FakeUserRepository:
         self.next_balance_id = 1
 
     async def get_users(
-        self,
-        user_id: int | None = None,
-        email: str | None = None,
-        user_status: str | None = None,
+        self, user_id: int | None = None, email: str | None = None, user_status: str | None = None
     ) -> list[User]:
         result = list(self.users.values())
         if user_id is not None:
@@ -116,12 +113,12 @@ class FakeUserRepository:
         self.next_user_id += 1
         return user
 
-    async def add_user_balance(self, user_id: int, currency: str) -> UserBalance:
+    async def add_user_balance(self, user_id: int, currency: str, amount: str = '0') -> UserBalance:
         balance = UserBalance(
             id=self.next_balance_id,
             user_id=user_id,
             currency=currency,
-            amount=Decimal('0'),
+            amount=Decimal(amount),
             created=datetime.now(timezone.utc),
         )
         self.balances[balance.id] = balance

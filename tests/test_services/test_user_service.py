@@ -9,7 +9,7 @@ from app.services.user import UserService
 
 
 @pytest.mark.asyncio
-async def test_get_users_service(user_service: UserService, user_repo: FakeUserRepository, faker: Faker):
+async def test_get_users_service(user_service: UserService, user_repo: FakeUserRepository, faker: Faker) -> None:
     email_str1 = faker.email(safe=True)
     user = await user_repo.add_user(email_str1)
 
@@ -20,7 +20,7 @@ async def test_get_users_service(user_service: UserService, user_repo: FakeUserR
 
 
 @pytest.mark.asyncio
-async def test_get_users_filter_service(user_service: UserService, user_repo: FakeUserRepository, faker: Faker):
+async def test_get_users_filter_service(user_service: UserService, user_repo: FakeUserRepository, faker: Faker) -> None:
     email_str1 = faker.email(safe=True)
     email_str2 = faker.email(safe=True)
     user1 = await user_repo.add_user(email_str1)
@@ -37,7 +37,7 @@ async def test_get_users_filter_service(user_service: UserService, user_repo: Fa
 
 
 @pytest.mark.asyncio
-async def test_add_user_service(user_service: UserService, user_repo: FakeUserRepository, faker: Faker):
+async def test_add_user_service(user_service: UserService, user_repo: FakeUserRepository, faker: Faker) -> None:
     email_str = faker.email(safe=True)
 
     user_model = await user_service.add_user(
@@ -54,7 +54,7 @@ async def test_add_user_service(user_service: UserService, user_repo: FakeUserRe
 
 
 @pytest.mark.asyncio
-async def test_add_user_service_fails(user_service: UserService, user_repo: FakeUserRepository, faker: Faker):
+async def test_add_user_service_fails(user_service: UserService, user_repo: FakeUserRepository, faker: Faker) -> None:
     email_str = faker.email(safe=True)
     await user_repo.add_user(email_str)
 
@@ -67,7 +67,7 @@ async def test_add_user_service_fails(user_service: UserService, user_repo: Fake
 
 
 @pytest.mark.asyncio
-async def test_update_user_service(user_service: UserService, user_repo: FakeUserRepository, faker: Faker):
+async def test_update_user_service(user_service: UserService, user_repo: FakeUserRepository, faker: Faker) -> None:
     email_str = faker.email(safe=True)
     user = await user_repo.add_user(email_str)
 
@@ -77,7 +77,9 @@ async def test_update_user_service(user_service: UserService, user_repo: FakeUse
 
 
 @pytest.mark.asyncio
-async def test_update_user_service_fails(user_service: UserService, user_repo: FakeUserRepository, faker: Faker):
+async def test_update_user_service_fails(
+    user_service: UserService, user_repo: FakeUserRepository, faker: Faker
+) -> None:
     email_str = faker.email(safe=True)
     user = await user_repo.add_user(email_str)
 
