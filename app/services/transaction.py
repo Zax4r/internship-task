@@ -122,7 +122,7 @@ class TransactionService:
 
             await self.user_repo.update_user_balance(balance_id=db_user_balance.id, new_amount=new_amount)
             await self.transaction_repo.update_transaction(
-                transaction_id=db_transaction.id, new_status=TransactionStatusEnum.roll_backed.value
+                transaction_id=db_transaction.id, new_status=TransactionStatusEnum.ROLLBACKED.value
             )
             new_db_transaction = await self.transaction_repo.get_transaction_by_id(transaction_id=db_transaction.id)
         logger.info(f'Transaction with user_id=`{user_id}` updated')
@@ -135,7 +135,7 @@ class TransactionService:
             raise TransactionDoesNotBelongToUserException(
                 detail=f'Transaction with id=`{db_transaction.id}` does not belong to user with id=`{db_user.id}`'
             )
-        if db_transaction.status == TransactionStatusEnum.roll_backed:
+        if db_transaction.status == TransactionStatusEnum.ROLLBACKED:
             raise TransactionAlreadyRollbackedException(
                 detail=f'Transaction with id=`{db_transaction.id}` is already rollbacked'
             )

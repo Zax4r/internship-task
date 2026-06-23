@@ -25,8 +25,8 @@ class CurrencyEnum(StrEnum):
 
 
 class TransactionStatusEnum(StrEnum):
-    processed = 'PROCESSED'
-    roll_backed = 'ROLLBACKED'
+    PROCESSED = 'PROCESSED'
+    ROLLBACKED = 'ROLLBACKED'
 
 
 class UserStatusEnum(StrEnum):

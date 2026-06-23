@@ -33,7 +33,7 @@ class SQLTransactionRepository(BaseTransactionRepository):
             user_id=user_id,
             currency=currency,
             amount=amount,
-            status=TransactionStatusEnum.processed.value,
+            status=TransactionStatusEnum.PROCESSED.value,
             created=datetime.now(timezone.utc),
         )
         self.session.add(new_transaction)

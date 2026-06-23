@@ -31,7 +31,7 @@ class FakeTransactionRepository(BaseTransactionRepository):
             user_id=user_id,
             currency=currency,
             amount=amount,
-            status=TransactionStatusEnum.processed.value,
+            status=TransactionStatusEnum.PROCESSED.value,
             created=datetime.now(timezone.utc),
         )
         self.transactions[self.next_transaction_id] = new_transaction

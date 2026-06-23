@@ -1,7 +1,10 @@
+from decimal import Decimal
+
 import pytest
 from faker import Faker
 
 from app.core.enums import CurrencyEnum, UserStatusEnum
+from app.models.transaction import Transaction
 from app.models.user import User
 from app.repositories.transaction.memory import FakeTransactionRepository
 from app.repositories.uow.memory import FakeUnitOfWork
@@ -48,3 +51,13 @@ async def active_user(user_repo: FakeUserRepository, faker: Faker) -> User:
 async def blocked_user(user_repo: FakeUserRepository, faker: Faker) -> User:
     user1 = await user_repo.add_user(faker.email(safe=True), UserStatusEnum.BLOCKED.value)
     return user1
+
+
+@pytest.fixture(scope='function')
+async def transaction(transaction_repo: FakeTransactionRepository, active_user: User) -> Transaction:
+    transaction1 = await transaction_repo.add_transaction(
+        active_user.id,
+        CurrencyEnum.USD.value,
+        Decimal('100.00'),
+    )
+    return transaction1

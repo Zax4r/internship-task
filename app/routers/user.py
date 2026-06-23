@@ -33,12 +33,12 @@ async def get_users(
     return await service.get_users(filters)
 
 
-@router.post('/users', response_model=UserModel, status_code=status.HTTP_200_OK)
+@router.post('/users', response_model=UserModel, status_code=status.HTTP_201_CREATED)
 async def post_user(user: RequestUserModel, service: UserService = Depends(get_user_service)) -> UserModel:
     return await service.add_user(user)
 
 
-@router.patch('/users/{user_id}', response_model=UserModel)
+@router.patch('/users/{user_id}', response_model=UserModel, status_code=status.HTTP_200_OK)
 async def patch_user(
     user_id: int, user: RequestUserUpdateModel, service: UserService = Depends(get_user_service)
 ) -> UserModel:

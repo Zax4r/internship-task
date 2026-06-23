@@ -33,7 +33,7 @@ async def get_transactions(
     return await service.get_transactions(user_id=user_id)
 
 
-@router.post('/{user_id}/transactions', response_model=TransactionModel, status_code=status.HTTP_200_OK)
+@router.post('/{user_id}/transactions', response_model=TransactionModel, status_code=status.HTTP_201_CREATED)
 async def post_transaction(
     user_id: int,
     transaction: RequestTransactionModel,
