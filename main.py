@@ -8,7 +8,6 @@ from loguru import logger
 from app.consumers.analytics import get_analytics_consumer
 from app.consumers.avro_example import get_avro_consumer
 from app.consumers.runner import ConsumerRunner
-from app.core.database import create_db_and_tables
 from app.core.exceptions import AppException
 from app.core.logger import setup_logging
 from app.routers.analytics import router as analytics_router
@@ -20,7 +19,6 @@ from app.routers.user import router as user_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
-    await create_db_and_tables()
     consumer_runner = ConsumerRunner([get_analytics_consumer(), get_avro_consumer()])
     await consumer_runner.start()
     yield
