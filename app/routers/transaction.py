@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_async_session
-from app.core.uow import UnitOfWork
-from app.repositories.transaction import TransactionRepository
-from app.repositories.user import UserRepository
+from app.repositories.transaction.sql import SQLTransactionRepository
+from app.repositories.uow.sql import SQLUnitOfWork
+from app.repositories.user.sql import SQLUserRepository
 from app.schemas.transaction import RequestTransactionModel, TransactionModel
 from app.services.transaction import TransactionService
 
@@ -16,9 +16,9 @@ router = APIRouter()
 def get_transaction_service(
     session: AsyncSession = Depends(get_async_session),
 ) -> TransactionService:
-    uow = UnitOfWork(session=session)
-    user_repo = UserRepository(session=session)
-    transaction_repo = TransactionRepository(session=session)
+    uow = SQLUnitOfWork(session=session)
+    user_repo = SQLUserRepository(session=session)
+    transaction_repo = SQLTransactionRepository(session=session)
     return TransactionService(
         uow=uow,
         user_repo=user_repo,

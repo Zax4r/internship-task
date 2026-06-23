@@ -3,7 +3,7 @@ from faker import Faker
 
 from app.core.enums import CurrencyEnum, UserStatusEnum
 from app.core.exceptions import UserAlreadyActiveException, UserAlreadyExistsException
-from app.repositories.user import FakeUserRepository
+from app.repositories.user.memory import FakeUserRepository
 from app.schemas.user import RequestListUserModel, RequestUserModel, RequestUserUpdateModel
 from app.services.user import UserService
 

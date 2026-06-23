@@ -4,13 +4,13 @@ from decimal import Decimal
 from app.core.constants import WEEKS_FOR_ANALYTICS
 from app.core.enums import EXCHANGE_RATES_TO_USD, CurrencyEnum
 from app.core.exceptions import ReportNotFoundException
-from app.core.uow import UnitOfWork
 from app.repositories.analytics import AnalyticsCacheRepository, AnalyticsRepository
+from app.repositories.uow.base import BaseUnitOfWork
 from app.schemas.analytics import AnalysisModel
 
 
 class AnalyticsService:
-    def __init__(self, uow: UnitOfWork, analytics_repo: AnalyticsRepository, cache_repo: AnalyticsCacheRepository):
+    def __init__(self, uow: BaseUnitOfWork, analytics_repo: AnalyticsRepository, cache_repo: AnalyticsCacheRepository):
         self.uow = uow
         self.analytics_repo = analytics_repo
         self.cache_repo = cache_repo

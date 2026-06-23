@@ -2,10 +2,10 @@ import pytest
 from faker import Faker
 
 from app.core.enums import CurrencyEnum, UserStatusEnum
-from app.core.uow import FakeUnitOfWork
 from app.models.user import User
-from app.repositories.transaction import FakeTransactionRepository
-from app.repositories.user import FakeUserRepository
+from app.repositories.transaction.memory import FakeTransactionRepository
+from app.repositories.uow.memory import FakeUnitOfWork
+from app.repositories.user.memory import FakeUserRepository
 from app.services.transaction import TransactionService
 from app.services.user import UserService
 

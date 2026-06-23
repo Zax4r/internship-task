@@ -8,8 +8,8 @@ from app.core.exceptions import (
     NegativeBalanceException,
 )
 from app.models.user import User
-from app.repositories.transaction import FakeTransactionRepository
-from app.repositories.user import FakeUserRepository
+from app.repositories.transaction.memory import FakeTransactionRepository
+from app.repositories.user.memory import FakeUserRepository
 from app.schemas.transaction import RequestTransactionModel
 from app.services.transaction import TransactionService
 

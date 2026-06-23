@@ -19,20 +19,20 @@ from app.core.exceptions import (
     UserBalanceDoesNotExistException,
     UserNotExistsException,
 )
-from app.core.uow import UnitOfWork
 from app.models.transaction import Transaction
 from app.models.user import User
-from app.repositories.transaction import TransactionRepository
-from app.repositories.user import UserRepository
+from app.repositories.transaction.base import BaseTransactionRepository
+from app.repositories.uow.base import BaseUnitOfWork
+from app.repositories.user.base import BaseUserRepository
 from app.schemas.transaction import RequestTransactionModel, TransactionModel
 
 
 class TransactionService:
     def __init__(
         self,
-        uow: UnitOfWork,
-        user_repo: UserRepository,
-        transaction_repo: TransactionRepository,
+        uow: BaseUnitOfWork,
+        user_repo: BaseUserRepository,
+        transaction_repo: BaseTransactionRepository,
     ):
         self.uow = uow
         self.user_repo = user_repo
