@@ -9,8 +9,8 @@ from app.core.exceptions import (
     UserAlreadyExistsException,
     UserNotExistsException,
 )
-from app.core.uow import UnitOfWork
-from app.repositories.user import UserRepository
+from app.repositories.uow.base import BaseUnitOfWork
+from app.repositories.user.base import BaseUserRepository
 from app.schemas.user import (
     RequestListUserModel,
     RequestUserModel,
@@ -22,7 +22,7 @@ from app.schemas.user import (
 
 
 class UserService:
-    def __init__(self, uow: UnitOfWork, user_repo: UserRepository):
+    def __init__(self, uow: BaseUnitOfWork, user_repo: BaseUserRepository):
         self.uow = uow
         self.user_repo = user_repo
 

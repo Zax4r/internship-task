@@ -25,4 +25,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 COPY . .
 
+RUN chmod +x prestart.sh
+ENTRYPOINT ["./prestart.sh"]
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

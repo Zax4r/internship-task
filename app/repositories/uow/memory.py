@@ -1,19 +1,22 @@
 from types import TracebackType
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from app.repositories.uow.base import BaseUnitOfWork
 
 
-class UnitOfWork:
-    def __init__(self, session: AsyncSession):
-        self.session = session
+class FakeUnitOfWork(BaseUnitOfWork):
+    def __init__(self):
+        self.committed = False
+        self.rolled_back = False
 
     async def commit(self) -> None:
-        await self.session.commit()
+        self.committed = True
 
     async def rollback(self) -> None:
-        await self.session.rollback()
+        self.rolled_back = True
 
-    async def __aenter__(self) -> 'UnitOfWork':
+    async def __aenter__(self) -> 'FakeUnitOfWork':
+        self.committed = False
+        self.rolled_back = False
         return self
 
     async def __aexit__(
@@ -26,5 +29,3 @@ class UnitOfWork:
             await self.rollback()
         else:
             await self.commit()
-
-        await self.session.close()

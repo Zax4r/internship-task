@@ -7,9 +7,10 @@ from sqlalchemy.orm import selectinload
 
 from app.core.enums import UserStatusEnum
 from app.models.user import User, UserBalance
+from app.repositories.user.base import BaseUserRepository
 
 
-class UserRepository:
+class SQLUserRepository(BaseUserRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 

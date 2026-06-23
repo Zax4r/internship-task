@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_async_session
 from app.core.enums import KafkaTopicEnum
 from app.core.redis import redis_client
-from app.core.uow import UnitOfWork
 from app.producers.message import MessageProducer
 from app.repositories.analytics import AnalyticsCacheRepository, AnalyticsRepository
 from app.repositories.cache import CacheRepository
+from app.repositories.uow.sql import SQLUnitOfWork
 from app.schemas.analytics import AnalysisModel
 from app.services.analytics import AnalyticsService
 from app.services.coders.orj import OrjsonCoder
@@ -25,7 +25,7 @@ async def get_message_producer_service() -> AsyncGenerator[MessageProducer, None
 
 
 def get_analytics_service(session: AsyncSession = Depends(get_async_session)) -> AnalyticsService:
-    uow = UnitOfWork(session=session)
+    uow = SQLUnitOfWork(session=session)
     analytics_repo = AnalyticsRepository(session=session)
     cache_repo = AnalyticsCacheRepository(CacheRepository(redis_client))
     return AnalyticsService(uow=uow, analytics_repo=analytics_repo, cache_repo=cache_repo)

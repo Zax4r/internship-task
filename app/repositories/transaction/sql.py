@@ -6,9 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.enums import TransactionStatusEnum
 from app.models.transaction import Transaction
+from app.repositories.transaction.base import BaseTransactionRepository
 
 
-class TransactionRepository:
+class SQLTransactionRepository(BaseTransactionRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -27,12 +28,12 @@ class TransactionRepository:
         transaction = transaction_result.scalar_one()
         return transaction
 
-    async def add_transaction(self, user_id: int, currency, amount: Decimal) -> Transaction:
+    async def add_transaction(self, user_id: int, currency: str, amount: Decimal) -> Transaction:
         new_transaction = Transaction(
             user_id=user_id,
             currency=currency,
             amount=amount,
-            status=TransactionStatusEnum.processed.value,
+            status=TransactionStatusEnum.PROCESSED.value,
             created=datetime.now(timezone.utc),
         )
         self.session.add(new_transaction)
